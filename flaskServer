@@ -1,0 +1,29 @@
+import os
+from flask import Flask, render_template, send_file, jsonify
+app = Flask(__name__)
+
+BASE_DIR = '/Users/Will/PycharmProjects/flaskServer/venv/testFiles'
+
+#Endpoint to list all CSV files in directory
+@app.route('/files')
+def dir_listing():
+
+    # Return 404 if path doesn't exist
+    if not os.path.exists(BASE_DIR):
+        return abort(404)
+
+    #Check each file in directory for csv
+    _, _, files = os.walk(BASE_DIR).__next__()
+    files = [f for f in files if f.endswith('.csv')]
+    return jsonify(files)
+
+#Endpoint to serve content of the file
+@app.route('/files/<string:req_file>')
+def serve_file(req_file):
+    req_file = os.path.join(BASE_DIR, req_file)
+    return send_file(req_file)
+
+
+if __name__ == "__main__":
+    app.run()
+
